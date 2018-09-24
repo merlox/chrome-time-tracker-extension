@@ -14,6 +14,7 @@ function start() {
     let app = ''
     let pageCounter = {}
     let orderedArrayCounter = {}
+    let valuesArray = []
 
     // let orderedElements = {
     //     hostnamePage: {
@@ -45,6 +46,9 @@ function start() {
     // Sacar el hostname de esos elementos ordenados en el array y ponerlos en el
     for(let b = 0; b < orderedArrayCounter.length; b++) {
         let page = orderedArrayCounter[b]
+
+        // Avoid empty values
+        if(page.length <= 2) continue
         if(page.substring(0, 4) != 'http') page = 'https://' + page
         let urlFromString = new URL(page)
 
@@ -89,6 +93,8 @@ function start() {
         }
     }
 
+    app += '<div class="chart"></div>'
+
     // Generate the html with the pages
     for(let i = 0; i < orderedHostnamesKeys.length; i++) {
         let page = orderedHostnamesKeys[i]
@@ -98,7 +104,9 @@ function start() {
         let {hours, minutes, seconds} = String(secs).toTime()
         let uniqueID = "details-" + (i+1)
 
-        app += `<div>
+        valuesArray.push(secs)
+
+        app += `<div class="row">
             ${i+1} - You spent in <a href="${page}">${page}</a> <b>${(Number(hours) == 0) ? '' : hours + " hours"}</b>, <b class="blue">${(Number(minutes) == 0) ? '' : minutes + " minutes"}</b>, <b class="green">${seconds} seconds</b> <a href="#" class="show-details-button" data-id-selector=${uniqueID}>[Show Details]</a>
             <ul id=${uniqueID} class="hidden">`
 
@@ -109,8 +117,6 @@ function start() {
             let subpageTime = orderedElements[page][subpage]
             // Avoid those with bad data
             if(subpageTime == NaN || subpageTime == undefined) continue
-            console.log('string subpage time', String(subpageTime))
-            console.log('conversion', String(subpageTime).toTime())
             let {hours, minutes, seconds} = String(subpageTime).toTime()
 
             app += `<li> Subpage <a href="${subpage}">${subpage}</a> <b>${(Number(hours) == 0) ? '' : hours + " hours"}</b>, <b class="blue">${(Number(minutes) == 0) ? '' : minutes + " minutes"}</b>, <b class="green">${seconds} seconds</b></li>`
@@ -118,7 +124,21 @@ function start() {
         app += '</ul></div>'
     }
 
+    console.log('screen width', )
+
     document.querySelector('#root').innerHTML = app
+
+
+    d3.select('.chart')
+        .selectAll('div')
+        .data(valuesArray)
+        .enter()
+        .append('div')
+        .style('width', d => {
+            let percentageSize = d * 100 / valuesArray[0]
+            return percentageSize + '%'
+        })
+        .text(d => { return d })
 
     // Add listeners to all the [Show Details] buttons
     document.querySelectorAll('.show-details-button').forEach(button => {

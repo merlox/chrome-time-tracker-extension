@@ -9,3 +9,23 @@
 .hidden {
     display: none;
 }
+
+.main-container {
+    width: 600px;
+    margin-right: -18px;
+}
+
+.row {
+    padding: 20px;
+    box-shadow: 0 0 5px 0 grey;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.chart div {
+    background-color: green;
+    margin-bottom: 2px;
+    text-align: right;
+    color: white;
+    padding: 5px;
+}
